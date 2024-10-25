@@ -71,7 +71,26 @@ class Interpreter(esolang.Base.Interpreter):
         return self.visit(tree.children[0])
 
 
-class _Eval(esolang.Base._Eval):
+class Simplifier(esolang.Base.Simplifier):
+    '''
+    >>> simplifier = Simplifier()
+    >>> simplifier.transform(parser.parse("1"))
+    1
+    >>> simplifier.transform(parser.parse("1+2"))
+    3
+    >>> simplifier.transform(parser.parse("1-2"))
+    -1
+    >>> simplifier.transform(parser.parse("(1+2)*3"))
+    9
+    >>> simplifier.transform(parser.parse("1+2*3"))
+    7
+    >>> simplifier.transform(parser.parse("1*2+3"))
+    5
+    >>> simplifier.transform(parser.parse("1*(2+3)"))
+    5
+    >>> simplifier.transform(parser.parse("(1*2)+3+4*(5-6)"))
+    1
+    '''
     def number(self, xs):
         return int(xs[0].value)
 
@@ -91,27 +110,9 @@ class _Eval(esolang.Base._Eval):
         return xs[0]
 
 
-def eval(expr):
-    '''
-    >>> eval("1")
-    1
-    >>> eval("1+2")
-    3
-    >>> eval("1-2")
-    -1
-    >>> eval("(1+2)*3")
-    9
-    >>> eval("1+2*3")
-    7
-    >>> eval("1*2+3")
-    5
-    >>> eval("1*(2+3)")
-    5
-    >>> eval("(1*2)+3+4*(5-6)")
-    1
-    '''
-    tree = parser.parse(expr)
-    return _Eval().transform(tree)
+########################################
+# other transformations
+########################################
 
 
 class _RemoveUnneededParentheses(lark.Transformer):

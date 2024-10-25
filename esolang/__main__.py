@@ -2,9 +2,11 @@ import readline
 import esolang.Arithmetic
 import esolang.Base
 import esolang.Variables
+import esolang.For
+import esolang.FunctionApplication
 
 
-def run_repl(lang = esolang.Variables):
+def run_repl(lang = esolang.For):
     parser = lang.parser
     interpreter = lang.Interpreter()
     while True:
@@ -21,4 +23,9 @@ def run_repl(lang = esolang.Variables):
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--lang', default='For')
+    args = parser.parse_args()
+
     run_repl()

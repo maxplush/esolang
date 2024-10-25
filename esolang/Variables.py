@@ -42,7 +42,18 @@ class Interpreter(esolang.Arithmetic.Interpreter):
         return self.locals[name]
 
 
-class _Eval(esolang.Arithmetic._Eval):
+class Simplifier(esolang.Arithmetic.Simplifier):
+    '''
+    >>> simplifier = Simplifier()
+    >>> simplifier.transform(parser.parse("a = 2"))
+    2
+    >>> simplifier.transform(parser.parse("a"))
+    2
+    >>> simplifier.transform(parser.parse("a + 2"))
+    4
+    >>> simplifier.transform(parser.parse("b = 2"))
+    2
+    '''
     def __init__(self):
         self.locals = {}
 
@@ -55,20 +66,3 @@ class _Eval(esolang.Arithmetic._Eval):
     def access_var(self, xs):
         name = xs[0]
         return self.locals[name]
-
-
-_state = _Eval()
-
-def eval(expr):
-    '''
-    >>> eval("a = 2")
-    2
-    >>> eval("a")
-    2
-    >>> eval("a + 2")
-    4
-    >>> eval("b = 2")
-    2
-    '''
-    tree = parser.parse(expr)
-    return _state.transform(tree)
