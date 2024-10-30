@@ -27,4 +27,11 @@ if __name__ == '__main__':
     parser.add_argument('--level', default=3, type=int)
     args = parser.parse_args()
 
-    run_repl()
+    if args.level == 0:
+        run_repl(esolang.level0_arithmetic)
+    if args.level == 1:
+        run_repl(esolang.level1_statements)
+    if args.level == 2:
+        run_repl(esolang.level2_loops)
+    if args.level == 3:
+        run_repl(esolang.level3_functions)
