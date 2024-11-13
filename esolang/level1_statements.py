@@ -48,7 +48,19 @@ grammar = esolang.level0_arithmetic.grammar + r"""
         | assign_var
         | block
         | /#.*/                -> comment
+        | if_statement
         |
+    # semantics
+    # first start will run if condition is true
+    # the second start if condition is F
+    # sometimes called the "the ternerary operator"
+
+    if_statement: condition "?" start ":" start
+
+    # we wil not implment a boolean variable type
+    # conditionals repersented as numbers
+
+    condition: start 
 
     block: "{" start* "}"
 
@@ -101,6 +113,9 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
                 return value
         self.stack[-1][name] = value
         return value
+    def if_statement(self, tree):
+        import code; code.interact(local=locals())
+        asd
 
     def assign_var(self, tree):
         name = tree.children[0].value
@@ -117,3 +132,10 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
         res = self.visit(tree.children[0])
         self.stack.pop()
         return res
+    
+tree = parser.parse("1 ? 2 : 3")
+# print(tree.pretty())  # Should now parse without errors
+
+# interpreter = Interpreter()
+# result = interpreter.visit(tree)
+# print(result) 
