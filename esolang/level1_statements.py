@@ -114,9 +114,17 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
         self.stack[-1][name] = value
         return value
     def if_statement(self, tree):
-        import code; code.interact(local=locals())
-        asd
+        condition = self.visit(tree.children[0])
+        branch_true = self.visit(tree.children[1])
+        branch_false = self.visit(tree.children[2])
 
+        if condition == 0: 
+            return branch_true
+        else:
+            return branch_false
+
+    def condition(self, tree):
+        pass
     def assign_var(self, tree):
         name = tree.children[0].value
         value = self.visit(tree.children[1])
@@ -134,8 +142,6 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
         return res
     
 tree = parser.parse("1 ? 2 : 3")
-# print(tree.pretty())  # Should now parse without errors
-
-# interpreter = Interpreter()
+interpreter = Interpreter()
 # result = interpreter.visit(tree)
 # print(result) 
