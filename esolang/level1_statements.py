@@ -1,44 +1,3 @@
-'''
-
-The following tests show example strings in the language.
-There are no meaningful commands at this point,
-only a block structure.
-
->>> tree = parser.parse("")
->>> tree = parser.parse(";")
->>> tree = parser.parse(";;;;")
->>> tree = parser.parse("{{}}")
->>> tree = parser.parse(";{};{;;}")
->>> tree = parser.parse(";{{}{{}}};{;{}{;};}")
-
-The following tests check that unbalanced blocks correctly raise exceptions.
-
->>> tree = parser.parse("{") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
->>> tree = parser.parse("{{}{}{{{}}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
->>> tree = parser.parse("{;;;}}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedCharacters:
-    
-The following checks test that comments work.
-
->>> tree = parser.parse(";{};#")
->>> tree = parser.parse(";{};#{")
->>> tree = parser.parse(";{#}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
-'''
-
 import lark
 import esolang.level0_arithmetic
 
@@ -47,20 +6,14 @@ grammar = esolang.level0_arithmetic.grammar + r"""
     %extend start: start (";" start)*
         | assign_var
         | block
-        | /#.*/                -> comment
         | if_statement
-        |
-    # semantics
-    # first start will run if condition is true
-    # the second start if condition is F
-    # sometimes called the "the ternerary operator"
+        | /#.*/               -> comment
 
-    if_statement: condition "?" start ":" start
+    if_statement: "if" condition ":" block "else" false_output
 
-    # we wil not implment a boolean variable type
-    # conditionals repersented as numbers
+    condition: "(" start ")"
 
-    condition: start 
+    false_output: start
 
     block: "{" start* "}"
 
@@ -76,6 +29,7 @@ parser = lark.Lark(grammar)
 class Interpreter(esolang.level0_arithmetic.Interpreter):
     '''
     >>> interpreter = Interpreter()
+    
     >>> interpreter.visit(parser.parse("a = 2"))
     2
     >>> interpreter.visit(parser.parse("a + 2"))
@@ -96,6 +50,20 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
     Traceback (most recent call last):
         ...
     ValueError: Variable c undefined
+    
+    >>> interpreter.visit(parser.parse("if (0): { 10 } else 5"))  
+    5
+    >>> interpreter.visit(parser.parse("if (1): { 10 } else 5"))  
+    5
+    >>> interpreter.visit(parser.parse("a = 10; if (a): { 10 } else 0"))
+    0
+    >>> interpreter.visit(parser.parse("a = 1; if (a): { 10 } else 100"))
+    100
+    >>> interpreter.visit(parser.parse("a=2; b=1; if (a-b): { 5 } else 1"))
+    1
+    >>> interpreter.visit(parser.parse("x = 2; { x = x + 3; x + 5 }"))
+    10
+
     '''
     def __init__(self):
         self.stack = [{}]
@@ -113,18 +81,14 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
                 return value
         self.stack[-1][name] = value
         return value
+
     def if_statement(self, tree):
-        condition = self.visit(tree.children[0])
-        branch_true = self.visit(tree.children[1])
-        branch_false = self.visit(tree.children[2])
-
-        if condition == 0: 
-            return branch_true
-        else:
-            return branch_false
-
-    def condition(self, tree):
-        pass
+        condition_result = self.visit(tree.children[0])
+        false_output = self.visit(tree.children[2])[0]
+        if condition_result == 0:
+            return self.visit(tree.children[1])[0]
+        return false_output 
+    
     def assign_var(self, tree):
         name = tree.children[0].value
         value = self.visit(tree.children[1])
@@ -140,8 +104,3 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
         res = self.visit(tree.children[0])
         self.stack.pop()
         return res
-    
-tree = parser.parse("1 ? 2 : 3")
-interpreter = Interpreter()
-# result = interpreter.visit(tree)
-# print(result) 
