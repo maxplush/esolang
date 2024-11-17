@@ -64,7 +64,6 @@ class Interpreter(esolang.level1_statements.Interpreter):
 
     >>> interpreter.visit(parser.parse("a=0; while a < 2 {a = a + 1}; a"))
     2
-
     '''
     def range(self, tree):
         return range(int(self.visit(tree.children[0])))
@@ -91,5 +90,6 @@ class Interpreter(esolang.level1_statements.Interpreter):
         else:
             return 1
         pass
+    
 interpreter = Interpreter()
 interpreter.visit(parser.parse("a=0; while a < 5 {a = a + 1}; a"))

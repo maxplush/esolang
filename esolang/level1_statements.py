@@ -63,7 +63,6 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
     1
     >>> interpreter.visit(parser.parse("x = 2; { x = x + 3; x + 5 }"))
     10
-
     '''
     def __init__(self):
         self.stack = [{}]

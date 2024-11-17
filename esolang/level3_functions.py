@@ -46,6 +46,8 @@ class Interpreter(esolang.level2_loops.Interpreter):
     11
     >>> interpreter.visit(parser.parse(r"f = lambda x,y,z : x+y-z; f(5, 6, 7)"))
     4
+    >>> interpreter.visit(parser.parse("f = lambda x : prime(x); print(f(19))"))
+    True
     '''
     def __init__(self):
         super().__init__()
@@ -57,6 +59,22 @@ class Interpreter(esolang.level2_loops.Interpreter):
         self.stack.append({})
         self.stack[0]['print'] = print
         self.stack[0]['stack'] = lambda: pprint.pprint(self.stack[1:])
+
+        def prime_check(n):
+            if n <= 1:
+                return False
+            if n <= 3:
+                return True
+            if n % 2 == 0 or n % 3 == 0:
+                return False
+            i = 5
+            while i * i <= n:
+                if n % i == 0 or n % (i + 2) == 0:
+                    return False
+                i += 6
+            return True
+
+        self.stack[0]['prime'] = prime_check
 
     def function_def(self, tree):
         names = [token.value for token in tree.children[:-1]]
@@ -81,3 +99,15 @@ class Interpreter(esolang.level2_loops.Interpreter):
             params = params[0]
 
         return self._get_from_stack(name)(*params)
+    
+    def range(self, tree):
+        if len(tree.children) == 2:
+            start = self.visit(tree.children[0])
+            end = self.visit(tree.children[1])
+        else:
+            start = 0
+            end = self.visit(tree.children[0])
+
+        return range(start, end)
+    
+    
