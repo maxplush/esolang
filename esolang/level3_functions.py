@@ -57,6 +57,7 @@ class Interpreter(esolang.level2_loops.Interpreter):
         self.stack.append({})
         self.stack[0]['print'] = print
         self.stack[0]['stack'] = lambda: pprint.pprint(self.stack[1:])
+        self.stack[0]['is_prime'] = self.is_prime
 
     def function_def(self, tree):
         names = [token.value for token in tree.children[:-1]]
@@ -92,4 +93,17 @@ class Interpreter(esolang.level2_loops.Interpreter):
 
         return range(start, end)
     
-    
+    def is_prime(self, n):
+        """
+        >>> interpreter = Interpreter()
+        >>> interpreter.visit(parser.parse("is_prime(5)"))
+        True
+        >>> interpreter.visit(parser.parse("is_prime(8)"))
+        False
+        """
+        if n < 2:
+            return False
+        for i in range(2, int(n ** 0.5) + 1):
+            if n % i == 0:
+                return False
+        return True

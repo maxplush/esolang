@@ -51,6 +51,10 @@ A simple esolang for experimenting with different syntax and semantics of progra
 3
 >>> interpreter.visit(parser.parse("a=0; while a < 2 {a = a + 1}; a"))
 2
+>>> interpreter.visit(parser.parse("is_prime(5)"))
+True
+>>> interpreter.visit(parser.parse("is_prime(8)"))
+False
 ```
 
 
